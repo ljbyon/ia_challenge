@@ -5,7 +5,7 @@ import json
 from typing import Any, Dict, List
 
 # Set page title
-st.title("SKU Attribute Prediction Evaluator")
+st.title("Evaluador de Predicciones de Atributos de SKU")
 
 # Helper functions from the original code
 def normalize_value(value):
@@ -234,27 +234,27 @@ def load_ground_truth_and_predictions(gt_file, pred_file):
         return ground_truth, predictions
     
     except json.JSONDecodeError as e:
-        st.error(f"Error parsing JSON: {str(e)}")
+        st.error(f"Error al analizar JSON: {str(e)}")
         return None, None
     except Exception as e:
-        st.error(f"Error loading files: {str(e)}")
+        st.error(f"Error al cargar archivos: {str(e)}")
         return None, None
 
 # Streamlit app layout
 st.markdown("""
-This app evaluates the performance of attribute predictions against ground truth data for SKUs.
-Upload your ground truth and prediction text files (JSON format) to see evaluation metrics.
+Esta aplicación evalúa el rendimiento de las predicciones de atributos contra los datos de referencia para SKUs.
+Sube tus archivos de texto de verdad fundamental y predicciones (formato JSON) para ver las métricas de evaluación.
 """)
 
 # File uploaders
-st.header("Upload Data Files")
-gt_file = st.file_uploader("Upload Ground Truth Text File", type="txt")
-pred_file = st.file_uploader("Upload Predictions Text File", type="txt")
+st.header("Subir Archivos de Datos")
+gt_file = st.file_uploader("Subir Archivo de Texto de Verdad Fundamental", type="txt")
+pred_file = st.file_uploader("Subir Archivo de Texto de Predicciones", type="txt")
 
 # Information about the expected file format
-with st.expander("Text File Format Information"):
+with st.expander("Información del Formato de Archivo de Texto"):
     st.markdown("""
-    Your text files should contain JSON data in the following format:
+    Tus archivos de texto deben contener datos JSON en el siguiente formato:
     
     ```json
     {
@@ -269,13 +269,13 @@ with st.expander("Text File Format Information"):
     }
     ```
     
-    Each file should have the SKU identifiers as the top-level keys, with a nested dictionary
-    of attribute-value pairs for each SKU.
+    Cada archivo debe tener los identificadores SKU como claves de nivel superior, con un diccionario anidado
+    de pares atributo-valor para cada SKU.
     """)
 
 # Process uploaded files
 if gt_file is not None and pred_file is not None:
-    with st.spinner("Processing files and evaluating predictions..."):
+    with st.spinner("Procesando archivos y evaluando predicciones..."):
         # Load data from text files (JSON)
         ground_truth, predictions = load_ground_truth_and_predictions(gt_file, pred_file)
         
@@ -284,15 +284,15 @@ if gt_file is not None and pred_file is not None:
             results = evaluate_dataset(predictions=predictions, ground_truth=ground_truth)
             
             # Display results
-            st.header("Evaluation Results")
+            st.header("Resultados de Evaluación")
             
             # 1. Global Results
-            st.subheader("Global Metrics")
+            st.subheader("Métricas Globales")
             results_global = pd.DataFrame(list(results['overall'].items()), columns=['KPI', 'Valor'])
             st.dataframe(results_global)
             
             # 2. SKU Results
-            st.subheader("Results per SKU")
+            st.subheader("Resultados por SKU")
             keep_cols = ['attr_coverage', 'attr_correctness', 'attr_accuracy', 'f2',
                          'attr_expected', 'attr_found', 'not_found', 'found_correct',
                          'found_incorrect', 'extra_attributes']
@@ -300,12 +300,12 @@ if gt_file is not None and pred_file is not None:
             st.dataframe(results_sku)
             
             # 3. SKU Attribute Results
-            st.subheader("Results per SKU Attribute")
+            st.subheader("Resultados por Atributo de SKU")
             results_sku_attr = results['attribute_results_df']
             st.dataframe(results_sku_attr)
             
             # 4. Attribute Group Results
-            st.subheader("Results Grouped by Attribute")
+            st.subheader("Resultados Agrupados por Atributo")
             grouped = results_sku_attr.groupby('attribute')
             result_attr = grouped.apply(
                 lambda group: pd.Series({
@@ -317,7 +317,7 @@ if gt_file is not None and pred_file is not None:
             st.dataframe(result_attr)
             
             # Download buttons
-            st.header("Download Results")
+            st.header("Descargar Resultados")
             col1, col2 = st.columns(2)
             col3, col4 = st.columns(2)
             
@@ -327,34 +327,34 @@ if gt_file is not None and pred_file is not None:
             
             with col1:
                 st.download_button(
-                    label="Download Global Results",
+                    label="Descargar Resultados Globales",
                     data=convert_df_to_csv(results_global),
-                    file_name='global_results.csv',
+                    file_name='resultados_globales.csv',
                     mime='text/csv',
                 )
             
             with col2:
                 st.download_button(
-                    label="Download SKU Results",
+                    label="Descargar Resultados de SKU",
                     data=convert_df_to_csv(results_sku),
-                    file_name='sku_results.csv',
+                    file_name='resultados_sku.csv',
                     mime='text/csv',
                 )
             
             with col3:
                 st.download_button(
-                    label="Download Attribute Results",
+                    label="Descargar Resultados de Atributos",
                     data=convert_df_to_csv(results_sku_attr),
-                    file_name='attribute_results.csv',
+                    file_name='resultados_atributos.csv',
                     mime='text/csv',
                 )
                 
             with col4:
                 st.download_button(
-                    label="Download Attribute Group Results",
+                    label="Descargar Resultados Agrupados por Atributo",
                     data=convert_df_to_csv(result_attr),
-                    file_name='attribute_group_results.csv',
+                    file_name='resultados_atributos_agrupados.csv',
                     mime='text/csv',
                 )
 else:
-    st.info("Please upload ground truth and predictions text files to begin evaluation.")
+    st.info("Por favor, sube los archivos de texto de verdad fundamental y predicciones para comenzar la evaluación.")
