@@ -242,13 +242,13 @@ def load_ground_truth_and_predictions(gt_file, pred_file):
 
 # Streamlit app layout
 st.markdown("""
-Esta aplicación evalúa el rendimiento de las predicciones de atributos contra los datos de referencia para SKUs.
-Sube tus archivos de texto de verdad fundamental y predicciones (formato JSON) para ver las métricas de evaluación.
+Esta aplicación evalúa el rendimiento (accuracy) de las predicciones (extracciones) de atributos contra los datos de la Fuente de la Verdad de cada SKU.
+Subir 2 archivos (texto en formato json): verdad y predicciones para ver las métricas de evaluación.
 """)
 
 # File uploaders
 st.header("Subir Archivos de Datos")
-gt_file = st.file_uploader("Subir Archivo de Texto de Verdad Fundamental", type="txt")
+gt_file = st.file_uploader("Subir Archivo de Texto de la Verdad", type="txt")
 pred_file = st.file_uploader("Subir Archivo de Texto de Predicciones", type="txt")
 
 # Information about the expected file format
@@ -300,7 +300,7 @@ if gt_file is not None and pred_file is not None:
             st.dataframe(results_sku)
             
             # 3. SKU Attribute Results
-            st.subheader("Resultados por Atributo de SKU")
+            st.subheader("Resultados por Atributo de Atributos por SKU")
             results_sku_attr = results['attribute_results_df']
             st.dataframe(results_sku_attr)
             
@@ -343,7 +343,7 @@ if gt_file is not None and pred_file is not None:
             
             with col3:
                 st.download_button(
-                    label="Descargar Resultados de Atributos",
+                    label="Descargar Resultados de Atributos por SKU",
                     data=convert_df_to_csv(results_sku_attr),
                     file_name='resultados_atributos.csv',
                     mime='text/csv',
